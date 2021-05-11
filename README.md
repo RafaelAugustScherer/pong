@@ -2,6 +2,7 @@
 Pong Game feito em Python com a ajuda da biblioteca PyGame
 
 ## Pré Requisitos
+[Python](https://www.python.org/downloads/)
 Pacote [PyGame](https://www.pygame.org/wiki/GettingStarted) instalado no sistema.
 
 ## Controles

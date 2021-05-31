@@ -14,40 +14,31 @@ field = Obj(0, 0, "assets/field.png")
 ball = Obj(617, 337, "assets/ball.png")
 player1 = Obj(50, 310, "assets/player1.png")
 player2 = Obj(1150, 310, "assets/player2.png")
-score1_img = Obj(500, 50, "assets/score/0.png")
-score2_img = Obj(710, 50, "assets/score/0.png")
+score1 = Obj(500, 50, "assets/score/0.png")
+score2 = Obj(710, 50, "assets/score/0.png")
 
 player1_moveup = False
 player1_movedown = False
-
-score1 = 0
-score2 = 0
 
 
 # Start the Game
 def start():
     global player1_moveup
     global player1_movedown
-    global score1
-    global score2
 
     # (Re)Define Start Positions
     ball.reset()
     player1.reset()
     player2.reset()
-    score1_img.setImg("assets/score/0.png")
-    score2_img.setImg("assets/score/0.png")
+    score1.reset()
+    score2.reset()
 
-    ball.setDirX(-5)
-    ball.setDirY(1)
+    ball.dirX = -5
+    ball.dirY = 1
 
     # (Re)Define Movement Properties
     player1_moveup = False
     player1_movedown = False
-
-    # (Re)Start Score System
-    score1 = 0
-    score2 = 0
 
     main()
 
@@ -56,114 +47,102 @@ def main():
     global player1_moveup
     global player1_movedown
 
-    global score1
-    global score2
-
     def move_player():
         if player1_moveup:
-            player1.setY(player1.getY() - 5)
+            player1.y -= 5
         if player1_movedown:
-            player1.setY(player1.getY() + 5)
+            player1.y += 5
 
-        if player1.getY() <= 0:
-            player1.setY(0)
-        elif player1.getY() >= 575:
-            player1.setY(575)
+        if player1.y <= 0:
+            player1.y = 0
+        elif player1.y >= 575:
+            player1.y = 575
 
     def move_player2():
-        if player2.getY() > ball.getY() - 46:
-            player2.setY(player2.getY() - 1.9)
+        if player2.y > ball.y - 46:
+            player2.y -= 1.9
         else:
-            player2.setY(player2.getY() + 1.9)
+            player2.y += 1.9
 
-        if player2.getY() >= 575:
-            player2.setY(575)
-        elif player2.getY() <= 0:
-            player2.setY(0)
+        if player2.y >= 575:
+            player2.y = 575
+        elif player2.y <= 0:
+            player2.y = 0
 
     def move_ball():
-        global score1
-        global score2
-
-        ball.setX(ball.getX() + ball.getDirX())
-        ball.setY(ball.getY() + ball.getDirY())
+        ball.x += ball.dirX
+        ball.y += ball.dirY
 
         # Detects if ball is in the same position of P1
-        if 125 >= ball.getX() >= 115:
-            if ball.getY() < player1.getY() + 146:
-                if ball.getY() + 35 > player1.getY():
+        if 125 >= ball.x >= 115:
+            if ball.y < player1.y + 146:
+                if ball.y + 35 > player1.y:
                     # Changes direction in case of hitting the P1
-                    ball.setDirX(ball.getDirX() * -1)
+                    ball.dirX *= -1
                     # Varies Y intensity on hit
-                    if ball.getDirY() > 0 and ball.getY() > player1.getY() + 116:
-                        ball.setDirY(random.uniform(-3.2, -1.2))
-                    elif ball.getDirY() > 0:
-                        ball.setDirY(random.uniform(1.5, 3.5))
-                    elif ball.getDirY() < 0 and ball.getY() < player1.getY() + 30:
-                        ball.setDirY(random.uniform(1.2, 3.2))
+                    if ball.dirY > 0 and ball.y > player1.y + 116:
+                        ball.dirY = random.uniform(-3.2, -1.2)
+                    elif ball.dirY > 0:
+                        ball.dirY = random.uniform(1.5, 3.5)
+                    elif ball.dirY < 0 and ball.y < player1.y + 30:
+                        ball.dirY = random.uniform(1.2, 3.2)
                     else:
-                        ball.setDirY(random.uniform(-3.5, -1.5))
-                    if ball.getDirY() < 13:
+                        ball.dirY = random.uniform(-3.5, -1.5)
+                    if ball.dirY < 13:
                         # Increase ball speed each Player's touch
-                        ball.setDirY(ball.getDirY() + 0.8)
+                        ball.dirY += 0.8
 
         # Same of P1 applies down here to P2
-        if 1115 >= ball.getX() >= 1105:
-            if ball.getY() < player2.getY() + 146:
-                if ball.getY() + 35 > player2.getY():
-                    ball.setDirX(ball.getDirX() * - 1)
-                    if ball.getDirY() > 0 and ball.getY() > player2.getY() + 116:
-                        ball.setDirY(random.uniform(-3.5, -1.5))
-                    elif ball.getDirY() > 0:
-                        ball.setDirY(random.uniform(1.2, 3.2))
-                    elif ball.getDirY() < 0 and ball.getY() < player2.getY() + 30:
-                        ball.setDirY(random.uniform(1.5, 3.5))
+        if 1115 >= ball.x >= 1105:
+            if ball.y < player2.y + 146:
+                if ball.y + 35 > player2.y:
+                    ball.dirX *= -1
+                    if ball.dirY > 0 and ball.y > player2.y + 116:
+                        ball.dirY = random.uniform(-3.5, -1.5)
+                    elif ball.dirY > 0:
+                        ball.dirY = random.uniform(1.2, 3.2)
+                    elif ball.dirY < 0 and ball.y < player2.y + 30:
+                        ball.dirY = random.uniform(1.5, 3.5)
                     else:
-                        ball.setDirY(random.uniform(-3.2, -1.2))
-                    if ball.getDirX() < -13:
-                        ball.setDirX(ball.getDirX() - 0.8)
+                        ball.dirY = random.uniform(-3.2, -1.2)
+                    if ball.dirX < -13:
+                        ball.dirX -= 0.8
 
         # Detects if ball hits a corner, then change its Y direction
-        if 684 > ball.getY() > 674:
-            ball.setDirY(random.randint(-2, -1))
-        elif 0 > ball.getY() > -10:
-            ball.setDirY(random.randint(1, 2))
+        if 684 > ball.y > 674:
+            ball.dirY = random.randint(-2, -1)
+        elif 0 > ball.y > -10:
+            ball.dirY = random.randint(1, 2)
 
         # Detects if a goal has been made
-        if ball.getX() < -50 or ball.getX() > 1330:
-            if ball.getX() < -50:
-                score(2)
-                ball.setDirX(-5)
-                ball.setDirY(random.uniform(-2, 2))
-            elif ball.getX() > 1330:
+        if ball.x < -50 or ball.x > 1330:
+            if ball.dirX > 0:
                 score(1)
-                ball.setDirX(5)
-                ball.setDirY(random.uniform(-2, 2))
+                ball.dirX = -5
+            else:
+                score(2)
+                ball.dirX = 5
 
-            ball.setX(617)
-            ball.setY(337)
-            ball.setDirX(ball.getDirX() * -1)
-            ball.setDirY(ball.getDirY() * -1)
+            ball.x = 617
+            ball.y = 337
+            ball.dirY = random.uniform(-2, 2)
 
     def score(player):
-        global score1
-        global score2
-
         if player == 1:
-            score1 += 1
-            score1_img.setImg("assets/score/{}.png".format(score1))
+            score1.value += 1
+            score1.set_img("assets/score/{}.png".format(score1.value))
         if player == 2:
-            score2 += 1
-            score2_img.setImg("assets/score/{}.png".format(score2))
+            score2.value += 1
+            score2.set_img("assets/score/{}.png".format(score2.value))
 
     # Prepare Scenario
     def draw():
-        window.blit(field.getImg(), (field.getX(), field.getY()))
-        window.blit(player1.getImg(), (player1.getX(), player1.getY()))
-        window.blit(player2.getImg(), (player2.getX(), player2.getY()))
-        window.blit(ball.getImg(), (ball.getX(), ball.getY()))
-        window.blit(score1_img.getImg(), (score1_img.getX(), score1_img.getY()))
-        window.blit(score2_img.getImg(), (score2_img.getX(), score2_img.getY()))
+        window.blit(field.img, (field.x, field.y))
+        window.blit(player1.img, (player1.x, player1.y))
+        window.blit(player2.img, (player2.x, player2.y))
+        window.blit(ball.img, (ball.x, ball.y))
+        window.blit(score1.img, (score1.x, score1.y))
+        window.blit(score2.img, (score2.x, score2.y))
 
     def end():
         window.blit(pygame.image.load("assets/win.png"), (315, 250))
@@ -181,7 +160,7 @@ def main():
 
     # Process Game in Real Time
     loop = True
-    while score1 < 3 and score2 < 3 and loop:
+    while score1.value < 3 and score2.value < 3 and loop:
         for evt in pygame.event.get():
             if evt.type == pygame.QUIT:
                 loop = False

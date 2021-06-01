@@ -1,8 +1,8 @@
 import pygame
 
-from obj import Obj
-from player import Player
-from ball import Ball
+from objects.obj import Obj
+from objects.player import Player
+from objects.ball import Ball
 
 # Init Screen
 pygame.init()
@@ -27,7 +27,7 @@ def start():
     for obj in objects:
         obj.reset()
 
-    # Execute main game
+    # Execute the main game
     main()
 
 
@@ -42,10 +42,7 @@ def main():
         elif keys_pressed[pygame.K_s]:
             player1.move(5)
 
-        if player1.y <= 0:
-            player1.y = 0
-        elif player1.y >= 575:
-            player1.y = 575
+        player1.corner_block()
 
     # Define a function to move player2 (Bot)
     def move_player2():
@@ -54,10 +51,7 @@ def main():
         else:
             player2.move(2)
 
-        if player2.y >= 575:
-            player2.y = 575
-        elif player2.y <= 0:
-            player2.y = 0
+        player2.corner_block()
 
     # Define a function to move the ball and detect trigger points
     def move_ball():

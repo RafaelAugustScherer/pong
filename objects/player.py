@@ -8,6 +8,12 @@ class Player:
         self.img = pygame.image.load(img)
         self.startVals = [x, y]
 
+    def corner_block(self):
+        if self.y > 575:
+            self.y = 575
+        elif self.y < 0:
+            self.y = 0
+
     def draw(self, window):
         window.blit(self.img, (self.x, self.y))
 

@@ -161,7 +161,8 @@ def main():
         clock.tick(60)
         print('fps:', clock.get_fps())
     # Ends the game when a player scores 3 goals
-    end()
+    if loop:
+        end()
 
 
 # Define the ending screen

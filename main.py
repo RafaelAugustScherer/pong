@@ -1,8 +1,8 @@
 import pygame
-import random
 
 from obj import Obj
 from player import Player
+from ball import Ball
 
 # Init Screen
 pygame.init()
@@ -12,24 +12,20 @@ pygame.display.set_caption("Pong")
 
 # Create Objects
 field = Obj(0, 0, "assets/field.png")
-ball = Obj(617, 337, "assets/ball.png")
-player1 = Player(50, 310, "assets/player1.png")
-player2 = Player(1150, 310, "assets/player2.png")
 score1 = Obj(500, 50, "assets/score/0.png")
 score2 = Obj(710, 50, "assets/score/0.png")
+ball = Ball(617, 337, "assets/ball.png")
+player1 = Player(50, 310, "assets/player1.png")
+player2 = Player(1150, 310, "assets/player2.png")
+
+objects = [field, ball, player1, player2, score1, score2]
 
 
 # Define a function to start the game
 def start():
     # (Re)Define Start Positions
-    ball.reset()
-    player1.reset()
-    player2.reset()
-    score1.reset()
-    score2.reset()
-
-    ball.dirX = -5
-    ball.dirY = 1
+    for obj in objects:
+        obj.reset()
 
     # Execute main game
     main()
@@ -40,16 +36,11 @@ def main():
     # Define a function to move player1 (Human)
     def move_player():
         keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_w] and keys_pressed[pygame.K_s]:
-            player1.dirY = 0
-        elif keys_pressed[pygame.K_w]:
-            player1.dirY = -5
-        elif keys_pressed[pygame.K_s]:
-            player1.dirY = 5
-        else:
-            player1.dirY = 0
 
-        player1.y += player1.dirY
+        if keys_pressed[pygame.K_w]:
+            player1.move(-5)
+        elif keys_pressed[pygame.K_s]:
+            player1.move(5)
 
         if player1.y <= 0:
             player1.y = 0
@@ -59,9 +50,9 @@ def main():
     # Define a function to move player2 (Bot)
     def move_player2():
         if player2.y > ball.y - 46:
-            player2.y -= 1.9
+            player2.move(-2)
         else:
-            player2.y += 1.9
+            player2.move(2)
 
         if player2.y >= 575:
             player2.y = 575
@@ -70,60 +61,56 @@ def main():
 
     # Define a function to move the ball and detect trigger points
     def move_ball():
-        ball.x += ball.dirX
-        ball.y += ball.dirY
+        ball.move()
 
         # Detects if the ball is in the same position of P1
         if 128 >= ball.x >= 112 and ball.dirX < 0:
             if player1.y - 33 < ball.y < player1.y + 179:
                 # Changes direction in case of hitting the P1
-                ball.dirX *= -1
+                ball.change_dir_x()
 
                 # Varies Y intensity on hit
-                if ball.dirY > 0 and ball.y > player1.y + 116:
-                    ball.dirY = random.uniform(-3.2, -1.2)
-                elif ball.dirY > 0:
-                    ball.dirY = random.uniform(1.5, 3.5)
+                if ball.dirY > 0 and ball.y + 46 > player1.y + 116:
+                    ball.rand_dir_y(-3.5, -1.5)
                 elif ball.dirY < 0 and ball.y < player1.y + 30:
-                    ball.dirY = random.uniform(1.2, 3.2)
+                    ball.rand_dir_y(1.5, 3.5)
+                elif ball.dirY > 0:
+                    ball.rand_dir_y(1.2, 3.2)
                 else:
-                    ball.dirY = random.uniform(-3.5, -1.5)
-                if ball.dirY < 13:
-                    # Increase ball speed each Player's touch
-                    ball.dirX += 0.8
+                    ball.rand_dir_y(-3.2, -1.2)
+
+                # Increase ball speed each Player's touch until 13
+                ball.speed_ctrl()
 
         # Same of P1 applies down here to P2
-        if 1160 >= ball.x + 46 >= 1150 and ball.dirX > 0:
-            if player2.y - 33 < ball.y < player2.y + 179:
-                ball.dirX *= -1
-                if ball.dirY > 0 and ball.y > player2.y + 116:
-                    ball.dirY = random.uniform(-3.5, -1.5)
-                elif ball.dirY > 0:
-                    ball.dirY = random.uniform(1.2, 3.2)
+        if 1166 >= ball.x + 46 >= 1150 and ball.dirX > 0:
+            if player2.y - 33 < ball.y < player2.y + 133:
+                ball.change_dir_x()
+                if ball.dirY > 0 and ball.y + 46 > player2.y + 116:
+                    ball.rand_dir_y(-3.5, -1.5)
                 elif ball.dirY < 0 and ball.y < player2.y + 30:
-                    ball.dirY = random.uniform(1.5, 3.5)
+                    ball.rand_dir_y(1.5, 3.5)
+                elif ball.dirY > 0:
+                    ball.rand_dir_y(1.2, 3.2)
                 else:
-                    ball.dirY = random.uniform(-3.2, -1.2)
-                if ball.dirX < -13:
-                    ball.dirX -= 0.8
+                    ball.rand_dir_y(-3.2, -1.2)
+                ball.speed_ctrl()
 
         # Detects if the ball hits a corner, then change its Y direction
         if 724 > ball.y + 46 > 720 and ball.dirY > 0:
-            ball.dirY = random.randint(-2, -1)
+            ball.rand_dir_y(-2, -1)
         elif 0 > ball.y > -4 and ball.dirY < 0:
-            ball.dirY = random.randint(1, 2)
+            ball.rand_dir_y(1, 2)
 
         # Detects if a goal has been made, score and reset ball position
         if ball.x < -50 or ball.x > 1330:
             if ball.dirX > 0:
                 score(1)
-                ball.dirX = -5
+                ball.reset()
             else:
                 score(2)
-                ball.dirX = 5
-            ball.x = 617
-            ball.y = 337
-            ball.dirY = random.uniform(-2, 2)
+                ball.reset()
+            ball.rand_dir_y(-2, 2)
 
     # Defines a function to score the goals
     def score(player):
@@ -136,12 +123,8 @@ def main():
 
     # Defines a function to draw every object in the screen
     def draw():
-        window.blit(field.img, (field.x, field.y))
-        window.blit(player1.img, (player1.x, player1.y))
-        window.blit(player2.img, (player2.x, player2.y))
-        window.blit(ball.img, (ball.x, ball.y))
-        window.blit(score1.img, (score1.x, score1.y))
-        window.blit(score2.img, (score2.x, score2.y))
+        for obj in objects:
+            obj.draw(window)
 
     # Process the game in real time
     loop = True
@@ -157,7 +140,7 @@ def main():
             if evt.type == pygame.QUIT:
                 loop = False
 
-        # Print the framerate in which the game is being played
+        # Print the frame rate in which the game is being played
         clock.tick(60)
         print('fps:', clock.get_fps())
     # Ends the game when a player scores 3 goals

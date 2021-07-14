@@ -1,24 +1,22 @@
 import pygame
 
+from objects.window import Window
 from objects.obj import Obj
 from objects.player import Player
 from objects.ball import Ball
 
 # Init Screen
-pygame.init()
-window = pygame.display.set_mode([1280, 720])
-clock = pygame.time.Clock()
-pygame.display.set_caption("Pong")
+game = Window(1280, 720, "Pong")
 
 # Create Objects
 field = Obj(0, 0, "assets/field.png")
 score1 = Obj(500, 50, "assets/score/0.png")
 score2 = Obj(710, 50, "assets/score/0.png")
 ball = Ball(617, 337, "assets/ball.png")
-player1 = Player(50, 310, "assets/player1.png")
-player2 = Player(1150, 310, "assets/player2.png")
+player1 = Player(94, 310, "assets/player.png")
+player2 = Player(1150, 310, "assets/player.png")
 
-objects = [field, ball, player1, player2, score1, score2]
+objects = [field, player1, player2, score1, score2, ball]
 
 
 # Define a function to start the game
@@ -38,18 +36,18 @@ def main():
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[pygame.K_w]:
-            player1.move(-5)
+            player1.move(-4)
         elif keys_pressed[pygame.K_s]:
-            player1.move(5)
+            player1.move(4)
 
         player1.corner_block()
 
     # Define a function to move player2 (Bot)
     def move_player2():
         if player2.y > ball.y - 46:
-            player2.move(-2)
+            player2.move(-1.97)
         else:
-            player2.move(2)
+            player2.move(1.97)
 
         player2.corner_block()
 
@@ -58,13 +56,13 @@ def main():
         ball.move()
 
         # Detects if the ball is in the same position of P1
-        if 128 >= ball.x >= 112 and ball.dirX < 0:
-            if player1.y - 33 < ball.y < player1.y + 179:
+        if 114 >= ball.x >= 94 and ball.dirX < 0:
+            if player1.y - 25 < ball.y < player1.y + 141:
                 # Changes direction in case of hitting the P1
                 ball.change_dir_x()
 
                 # Varies Y intensity on hit
-                if ball.dirY > 0 and ball.y + 46 > player1.y + 116:
+                if ball.dirY > 0 and ball.y + 30 > player1.y + 116:
                     ball.rand_dir_y(-3.5, -1.5)
                 elif ball.dirY < 0 and ball.y < player1.y + 30:
                     ball.rand_dir_y(1.5, 3.5)
@@ -77,10 +75,10 @@ def main():
                 ball.speed_ctrl()
 
         # Same of P1 applies down here to P2
-        if 1166 >= ball.x + 46 >= 1150 and ball.dirX > 0:
-            if player2.y - 33 < ball.y < player2.y + 133:
+        if 1170 >= ball.x + 30 >= 1150 and ball.dirX > 0:
+            if player2.y - 25 < ball.y < player2.y + 146:
                 ball.change_dir_x()
-                if ball.dirY > 0 and ball.y + 46 > player2.y + 116:
+                if ball.dirY > 0 and ball.y + 30 > player2.y + 116:
                     ball.rand_dir_y(-3.5, -1.5)
                 elif ball.dirY < 0 and ball.y < player2.y + 30:
                     ball.rand_dir_y(1.5, 3.5)
@@ -91,9 +89,9 @@ def main():
                 ball.speed_ctrl()
 
         # Detects if the ball hits a corner, then change its Y direction
-        if 724 > ball.y + 46 > 720 and ball.dirY > 0:
+        if 704 > ball.y + 30 > 700 and ball.dirY > 0:
             ball.rand_dir_y(-2, -1)
-        elif 0 > ball.y > -4 and ball.dirY < 0:
+        elif 20 > ball.y > 16 and ball.dirY < 0:
             ball.rand_dir_y(1, 2)
 
         # Detects if a goal has been made, score and reset ball position
@@ -115,18 +113,13 @@ def main():
             score2.value += 1
             score2.set_img("assets/score/{}.png".format(score2.value))
 
-    # Defines a function to draw every object in the screen
-    def draw():
-        for obj in objects:
-            obj.draw(window)
-
     # Process the game in real time
     loop = True
     while score1.value < 3 and score2.value < 3 and loop:
         move_ball()
         move_player()
         move_player2()
-        draw()
+        game.update(objects)
         pygame.display.update()
 
         # Exit the game if the close button is pressed
@@ -134,9 +127,6 @@ def main():
             if evt.type == pygame.QUIT:
                 loop = False
 
-        # Print the frame rate in which the game is being played
-        clock.tick(60)
-        print('fps:', clock.get_fps())
     # Ends the game when a player scores 3 goals
     if loop:
         end()
@@ -145,8 +135,12 @@ def main():
 # Define the ending screen
 def end():
     loop = True
+    ending = "assets/victory.png"
+    if score2.value == 3:
+        ending = "assets/defeat.png"
+
     while loop:
-        window.blit(pygame.image.load("assets/win.png"), (315, 250))
+        game.window.blit(pygame.image.load(ending), (350, 200))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -155,7 +149,7 @@ def end():
                 if event.key == pygame.K_r:
                     start()
                     loop = False
-                if event.key == pygame.K_s:
+                if event.key == pygame.K_e:
                     loop = False
 
 

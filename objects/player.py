@@ -9,10 +9,10 @@ class Player:
         self.startVals = [x, y]
 
     def corner_block(self):
-        if self.y > 575:
-            self.y = 575
-        elif self.y < 0:
-            self.y = 0
+        if self.y > 558:
+            self.y = 558
+        elif self.y < 16:
+            self.y = 16
 
     def draw(self, window):
         window.blit(self.img, (self.x, self.y))
